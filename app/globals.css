@@ -1,26 +1,50 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-cream: #FFF6E9;
+  --color-sky: #D9EEF7;
+  --color-card: #FFFDF8;
+  --color-marigold: #F2975B;
+  --color-marigold-dark: #E07A3E;
+  --color-ink: #4A4238;
+  --color-inkmuted: #8B8177;
+  --color-sage: #9CB380;
+
+  --font-display: var(--font-baloo), sans-serif;
+  --font-body: var(--font-quicksand), sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer components {
+  .app-shell {
+    @apply min-h-screen w-full bg-gradient-to-b from-cream to-sky
+           flex items-center justify-center px-5 relative overflow-hidden;
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  .app-card {
+    @apply w-full max-w-[380px] bg-card rounded-3xl shadow-lg shadow-orange-100/50
+           p-6 relative z-10;
+  }
+
+  .app-heading {
+    @apply font-display text-3xl font-bold text-center text-ink mb-2;
+  }
+
+  .app-subtext {
+    @apply font-body text-center text-inkmuted mb-6;
+  }
+
+  .app-input {
+    @apply font-body border border-orange-100 bg-white rounded-2xl px-4 py-3
+           text-ink placeholder:text-inkmuted outline-none
+           focus:ring-2 focus:ring-marigold/40 transition;
+  }
+
+  .btn-primary {
+    @apply font-display bg-marigold text-white rounded-2xl py-3 font-semibold
+           transition hover:bg-marigold-dark disabled:opacity-60;
+  }
+
+  .link-muted {
+    @apply font-body text-sm text-sage text-center;
+  }
 }

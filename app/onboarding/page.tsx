@@ -68,37 +68,38 @@ export default function OnboardingPage() {
       return;
     }
 
-    router.push("/today");
+    router.push("/menu");
     router.refresh();
   }
 
   return (
-    <main className="min-h-screen bg-orange-50 flex flex-col items-center px-6 py-10">
-      <div className="w-full max-w-md">
+    <main className="app-shell items-start py-10">
+      <div className="w-full max-w-md relative z-10">
         {/* progress dots */}
         <div className="flex justify-center gap-2 mb-8">
           {STEPS.map((s) => (
             <div
               key={s}
-              className={`h-2 w-8 rounded-full ${
+              className={`h-2 w-8 rounded-full transition ${
                 s === step
-                  ? "bg-orange-500"
+                  ? "bg-marigold"
                   : STEPS.indexOf(s) < STEPS.indexOf(step)
-                  ? "bg-orange-300"
-                  : "bg-orange-100"
+                  ? "bg-marigold/50"
+                  : "bg-marigold/15"
               }`}
             />
           ))}
         </div>
 
         {step === "tags" && (
-          <div className="bg-white rounded-2xl shadow p-6">
-            <h1 className="text-2xl font-bold mb-1">
-              What did your inner child love?
+          <div className="bg-card rounded-3xl shadow-lg shadow-orange-100/50 p-6 min-h-[560px] flex flex-col">
+            <h1 className="font-display text-2xl font-bold text-ink mb-1">
+              What made your Younger Self light up?
             </h1>
-            <p className="text-gray-600 text-sm mb-6">
-              Pick up to 3 — we'll shape your prompts around these.
+            <p className="font-body text-inkmuted text-sm mb-6">
+              Pick up to three. We will shape your daily adventures around them.
             </p>
+
             <div className="grid grid-cols-2 gap-3 mb-6">
               {TAGS.map((tag) => {
                 const selected = selectedTags.includes(tag.value);
@@ -107,62 +108,68 @@ export default function OnboardingPage() {
                     key={tag.value}
                     type="button"
                     onClick={() => toggleTag(tag.value)}
-                    className={`rounded-xl border-2 px-3 py-4 text-left transition ${
+                    className={`font-body rounded-2xl border-2 px-3 py-4 text-left transition ${
                       selected
-                        ? "border-orange-500 bg-orange-50"
-                        : "border-gray-200 bg-white"
+                        ? "border-marigold bg-marigold/10"
+                        : "border-orange-100 bg-white"
                     }`}
                   >
                     <div className="text-2xl mb-1">{tag.emoji}</div>
-                    <div className="text-sm font-medium">{tag.label}</div>
+                    <div className="text-sm font-medium text-ink">{tag.label}</div>
                   </button>
                 );
               })}
             </div>
-            <button
-              disabled={selectedTags.length === 0}
-              onClick={goNext}
-              className="w-full bg-orange-500 text-white rounded-xl py-3 font-medium disabled:opacity-40"
-            >
-              Continue ({selectedTags.length}/3 selected)
-            </button>
+
+            <div className="mt-auto">
+              <button
+                disabled={selectedTags.length === 0}
+                onClick={goNext}
+                className="btn-primary w-full"
+              >
+                {selectedTags.length > 0
+                  ? "You've picked your Favs!"
+                  : "Pick a few to continue"}
+              </button>
+            </div>
           </div>
         )}
 
         {step === "cadence" && (
-          <div className="bg-white rounded-2xl shadow p-6">
-            <h1 className="text-2xl font-bold mb-1">How often?</h1>
-            <p className="text-gray-600 text-sm mb-6">
-              You can change this anytime in settings — no pressure.
+          <div className="bg-card rounded-3xl shadow-lg shadow-orange-100/50 p-6 min-h-[560px] flex flex-col">
+            <h1 className="font-display text-2xl font-bold text-ink mb-1">
+              How often would you like a little adventure?
+            </h1>
+            <p className="font-body text-inkmuted text-sm mb-6">
+              Choose a rhythm that feels good for you. You can always change it later 🌱
             </p>
+
             <div className="flex flex-col gap-3 mb-6">
               {CADENCE_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
                   type="button"
                   onClick={() => setCadence(opt.value)}
-                  className={`rounded-xl border-2 px-4 py-3 text-left transition ${
+                  className={`font-body rounded-2xl border-2 px-4 py-3 text-left transition ${
                     cadence === opt.value
-                      ? "border-orange-500 bg-orange-50"
-                      : "border-gray-200 bg-white"
+                      ? "border-marigold bg-marigold/10"
+                      : "border-orange-100 bg-white"
                   }`}
                 >
-                  <div className="font-medium">{opt.label}</div>
-                  <div className="text-sm text-gray-500">{opt.sublabel}</div>
+                  <div className="font-medium text-ink">{opt.label}</div>
+                  <div className="text-sm text-inkmuted">{opt.sublabel}</div>
                 </button>
               ))}
             </div>
-            <div className="flex gap-3">
+
+            <div className="mt-auto flex gap-3">
               <button
                 onClick={goBack}
-                className="flex-1 border border-gray-300 rounded-xl py-3 font-medium"
+                className="font-body flex-1 border-2 border-orange-100 text-ink rounded-2xl py-3 font-medium"
               >
                 Back
               </button>
-              <button
-                onClick={goNext}
-                className="flex-1 bg-orange-500 text-white rounded-xl py-3 font-medium"
-              >
+              <button onClick={goNext} className="btn-primary flex-1">
                 Continue
               </button>
             </div>
@@ -170,38 +177,43 @@ export default function OnboardingPage() {
         )}
 
         {step === "memory" && (
-          <div className="bg-white rounded-2xl shadow p-6">
-            <h1 className="text-2xl font-bold mb-1">
-              One memory (optional)
+          <div className="bg-card rounded-3xl shadow-lg shadow-orange-100/50 p-6 min-h-[560px] flex flex-col">
+            <h1 className="font-display text-2xl font-bold text-ink mb-1">
+              A little memory, if you'd like
             </h1>
-            <p className="text-gray-600 text-sm mb-4">
-              What's something you loved doing as a kid? We'll use this to
-              shape your very first prompt.
+            <p className="font-body text-inkmuted text-sm mb-4">
+              Is there something you loved doing when you were little? Share
+              whatever comes to mind.
             </p>
+
             <textarea
               value={memory}
               onChange={(e) => setMemory(e.target.value)}
-              placeholder="e.g. Building blanket forts and pretending they were spaceships..."
+              placeholder="e.g. Building blanket forts, making up secret worlds, dancing around the living room…"
               rows={4}
-              className="w-full border border-gray-300 rounded-xl px-4 py-3 text-base mb-6 focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="app-input w-full mb-6 resize-none"
             />
+
             {error && (
-              <p className="text-red-600 text-sm mb-4 text-center">{error}</p>
+              <p className="font-body text-red-500 text-sm mb-4 text-center">
+                {error}
+              </p>
             )}
-            <div className="flex gap-3">
+
+            <div className="mt-auto flex gap-3">
               <button
                 onClick={goBack}
                 disabled={saving}
-                className="flex-1 border border-gray-300 rounded-xl py-3 font-medium disabled:opacity-40"
+                className="font-body flex-1 border-2 border-orange-100 text-ink rounded-2xl py-3 font-medium disabled:opacity-40"
               >
                 Back
               </button>
               <button
                 onClick={finishOnboarding}
                 disabled={saving}
-                className="flex-1 bg-orange-500 text-white rounded-xl py-3 font-medium disabled:opacity-50"
+                className="btn-primary flex-1"
               >
-                {saving ? "Saving..." : "Let's go"}
+                {saving ? "Saving..." : "Let's Play"}
               </button>
             </div>
           </div>

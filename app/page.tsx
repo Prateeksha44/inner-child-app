@@ -1,4 +1,4 @@
-/*import { redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 // Root route: no UI of its own. It just figures out where the user
@@ -23,11 +23,6 @@ export default async function Home() {
     redirect("/onboarding");
   }
 
-  redirect("/today");
+  redirect("/menu");
 }
-*/
-import { redirect } from "next/navigation";
 
-export default function Home() {
-  redirect("/today");
-}

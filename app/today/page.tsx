@@ -1,70 +1,84 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import SignOutButton from "./sign-out-button";
+"use client";
 
-export default async function TodayPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import KiteBackground from "@/components/KiteBackground";
+import { createClient } from "@/lib/supabase/client";
 
-  if (!user) redirect("/login");
+export default function TodayPage() {
+  const supabase = createClient();
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
+  const [promptText, setPromptText] = useState("");
+  const [memoryIntro, setMemoryIntro] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!profile?.onboarded) redirect("/onboarding");
+  useEffect(() => {
+    async function loadPrompt() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-  // Basic tag-matching: find a prompt that overlaps with the user's tags.
-  // (This gets upgraded on Day 2 with no-repeat rotation + cadence timing
-  // + the AI-personalized Day-1 welcome prompt.)
-  const { data: matchingPrompts } = await supabase
-    .from("prompts")
-    .select("*")
-    .overlaps("tags", profile.tags ?? []);
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
-  const prompt =
-    matchingPrompts && matchingPrompts.length > 0
-      ? matchingPrompts[Math.floor(Math.random() * matchingPrompts.length)]
-      : null;
+      const { data, error } = await supabase
+        .rpc("get_or_create_todays_prompt", { p_user_id: user.id })
+        .single();
+
+      if (!error && data) {
+        setPromptText(data.prompt_text);
+        if (data.is_first && data.childhood_memory) {
+          setMemoryIntro(data.childhood_memory);
+        }
+      }
+
+      setLoading(false);
+    }
+
+    loadPrompt();
+  }, []);
 
   return (
-    <main className="min-h-screen bg-orange-50 flex flex-col items-center px-6 py-10">
-      <div className="w-full max-w-md">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-xl font-bold">Today's play 🎈</h1>
-          <SignOutButton />
-        </div>
+    <main className="app-shell items-start py-10">
+      <KiteBackground position="bottom" />
 
-        <div className="bg-white rounded-2xl shadow p-6 mb-4">
-          {prompt ? (
-            <p className="text-lg leading-relaxed">{prompt.text}</p>
-          ) : (
-            <p className="text-gray-500">
-              No matching prompt found yet — run{" "}
-              <code>supabase/seed_prompts.sql</code> in your Supabase SQL
-              editor, then refresh.
-            </p>
-          )}
-        </div>
+      <div className="app-card">
+        <Link
+          href="/menu"
+          className="font-body text-sm text-inkmuted hover:text-marigold transition mb-4 inline-block"
+        >
+          ‹ Your Little World
+        </Link>
 
-        <div className="bg-white/60 rounded-2xl p-4 text-sm text-gray-600">
-          <p className="mb-1">
-            <strong>Your tags:</strong> {profile.tags?.join(", ") || "none"}
-          </p>
-          <p>
-            <strong>Cadence:</strong> {profile.cadence}
-          </p>
-        </div>
+        <h1 className="app-heading mb-4">Today's Little Adventure</h1>
 
-        <p className="text-center text-xs text-gray-400 mt-8">
-          Capture, streaks, and your weekly recap are coming next — this
-          confirms auth + onboarding + prompt matching are working end to
-          end.
+        <p className="app-subtext">
+          One tiny invitation to reconnect with the playful part of you 🌤️
         </p>
+
+        {memoryIntro && (
+  <p className="font-body text-sm text-inkmuted text-center italic mb-4">
+    You once told us: "{memoryIntro}" — thank you for sharing that. 🌱
+  </p>
+)}
+
+        <div className="bg-marigold/10 border border-marigold/30 rounded-2xl px-4 py-5 mb-6 min-h-[80px] flex items-center justify-center">
+          <p className="font-display text-lg text-ink text-center leading-relaxed">
+            {loading ? "Finding your little adventure..." : promptText}
+          </p>
+        </div>
+
+        <p className="font-body text-sm text-inkmuted text-center mt-2 mb-6">
+          There is NO RIGHT WAY ✨
+          <br />
+          Just follow your curiosity 🌱
+        </p>
+
+        <Link href="/capture" className="btn-primary w-full block text-center">
+          Let's Capture this Moment!
+        </Link>
       </div>
     </main>
   );

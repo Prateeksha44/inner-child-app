@@ -2,38 +2,26 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import KiteBackground from "@/components/KiteBackground";
 
 export default function LoginPage() {
   const supabase = createClient();
 
   const [isLogin, setIsLogin] = useState(true);
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-
     setLoading(true);
     setError("");
 
-    let result;
+    const result = isLogin
+      ? await supabase.auth.signInWithPassword({ email, password })
+      : await supabase.auth.signUp({ email, password });
 
-    if (isLogin) {
-      result = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-    } else {
-      result = await supabase.auth.signUp({
-        email,
-        password,
-      });
-    }
-    console.log(result);
     setLoading(false);
 
     if (result.error) {
@@ -45,26 +33,24 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-orange-50 px-6">
-      <div className="w-full max-w-sm bg-white rounded-2xl shadow p-6">
+    <main className="app-shell">
+      <KiteBackground />
 
-        <h1 className="text-3xl font-bold text-center mb-2">
-          Reconnect with your inner child 🎈
-        </h1>
+      <div className="app-card">
+        <h1 className="app-heading">Little Adventures</h1>
 
-        <p className="text-center text-gray-500 mb-6">
-          {isLogin ? "Log into your account" : "Create your account"}
+        <p className="app-subtext">
+          {isLogin ? "Take a moment for yourself" : "Create your account"}
         </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-
           <input
             type="email"
             required
             placeholder="Email"
             value={email}
-            onChange={(e)=>setEmail(e.target.value)}
-            className="border rounded-xl px-4 py-3"
+            onChange={(e) => setEmail(e.target.value)}
+            className="app-input"
           />
 
           <input
@@ -73,38 +59,24 @@ export default function LoginPage() {
             minLength={6}
             placeholder="Password"
             value={password}
-            onChange={(e)=>setPassword(e.target.value)}
-            className="border rounded-xl px-4 py-3"
+            onChange={(e) => setPassword(e.target.value)}
+            className="app-input"
           />
 
-          <button
-            disabled={loading}
-            className="bg-orange-500 text-white rounded-xl py-3"
-          >
-            {loading
-              ? "Please wait..."
-              : isLogin
-              ? "Log In"
-              : "Create Account"}
+          <button disabled={loading} className="btn-primary">
+            {loading ? "Please wait..." : isLogin ? "Let's Go" : "Create Account"}
           </button>
 
           {error && (
-            <p className="text-red-600 text-sm text-center">
-              {error}
-            </p>
+            <p className="font-body text-red-500 text-sm text-center">{error}</p>
           )}
-
         </form>
 
-        <button
-          onClick={()=>setIsLogin(!isLogin)}
-          className="w-full mt-5 text-sm text-orange-600"
-        >
+        <button onClick={() => setIsLogin(!isLogin)} className="w-full mt-5 link-muted">
           {isLogin
-            ? "Need an account? Sign Up"
+            ? "New here? Create your little space 🌱"
             : "Already have an account? Log In"}
         </button>
-
       </div>
     </main>
   );
