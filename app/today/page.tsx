@@ -23,9 +23,16 @@ export default function TodayPage() {
         return;
       }
 
+      type PromptResult = {
+        prompt_id: string;
+        prompt_text: string;
+        is_first: boolean;
+        childhood_memory: string | null;
+      };
+
       const { data, error } = await supabase
         .rpc("get_or_create_todays_prompt", { p_user_id: user.id })
-        .single();
+        .single<PromptResult>();
 
       if (!error && data) {
         setPromptText(data.prompt_text);
